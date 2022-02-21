@@ -20,7 +20,7 @@ public class servidoUDP {
         //  Mostramos por consola los datos del servidor
         try{
             //Si se usa localhost:
-            System.out.println("IP de LocalHost = " + InetAddress.getLocalHost().toString());
+            //System.out.println("IP de LocalHost = " + InetAddress.getLocalHost().toString());
             //si se usa una ip
             System.out.println("\nEscuchando en: ");
             System.out.println("IP Host = " + ip.getHostAddress());
@@ -31,7 +31,7 @@ public class servidoUDP {
         }
 
         // A traves de esta Socket enviaremos detagramas del tipo DatagramPacket
-        DatagramPacket dgmSocket = null;
+        DatagramSocket dgmSocket = null;
         try{
             dgmSocket = new DatagramSocket(_PUERTO, ip);
         } catch (SocketException se){
@@ -47,7 +47,50 @@ public class servidoUDP {
 
                 //Creamos un contener de datagrama, cuyo buffer sera el array creado antes
 
-                DatagramPacket datagramPacket = new DatagramPacket(bufferEntrada, 4);
+                DatagramPacket dgmPaquete= new DatagramPacket(bufferEntrada, 4);
+
+                //Esperamos a recibir un paquete
+                dgmSocket.receive(dgmPaquete);
+
+                //Podemos extraer informacion del paquete: 
+
+                //N° de puerto desde donde se envio
+                int puertoRemitente = dgmPaquete.getPort();
+                //Direccion de Internet desde donde se envio
+                InetAddress ipRemitente = dgmPaquete.getAddress();
+
+                //Envolvemos el buffer con un ByteArrayInputStream...
+                ByteArrayInputStream arrayEntrada = new ByteArrayInputStream(bufferEntrada);
+                //... que volvemos a envolver con un DataInputStream
+                DataInputStream datosEntrada = new DataInputStream(arrayEntrada);
+                // Y leemos un numero entero a partir del array de bytes
+                int entrada = datosEntrada.readInt();
+
+                //hacemos los calculos que correspondan
+                long salida =(long) entrada * (long) entrada;
+
+                //Creamos un ByteArrayOutputStream sobre el que podemos escribir
+                ByteArrayOutputStream arraySalida = new ByteArrayOutputStream();
+                // LO envolvemos con un DataOutputStream
+                DataOutputStream datosSalida = new DataOutputStream(arraySalida);
+                // Escribimos el resultados, que debe ocupar 8 bytes
+                datosSalida.writeLong(salida);
+
+                //Cerramos el buffer de escritura 
+                datosSalida.close();
+
+                //Generamos el paquete de vuelta, usando los datos del remitente del paquete original
+                dgmPaquete = new DatagramPacket(arraySalida.toByteArray(), 8, ipRemitente, puertoRemitente);
+                //Enviamos
+                dgmSocket.send(dgmPaquete);
+
+                //Registremos en salida estandard
+                System.out.println(formatter.format(new Date()) + "\tCliente = "+ ipRemitente + ":" +
+                                   puertoRemitente + "\tEntrada = " + entrada + "\tSalida = " + salida);
+
+
+            } catch (Exception e){
+                System.err.println("Se ha producido el error " + e);
             }
         }
 
