@@ -1,11 +1,9 @@
-package E2;
-
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.io.*;
 
-public class servidoUDP {
+public class servidorUDP {
     // Configuramos la IP  y el Puerto para el servidor
     private static final String _IP = "192.168.1.69";
     private static final int _PUERTO = 1234;
@@ -19,9 +17,8 @@ public class servidoUDP {
 
         //  Mostramos por consola los datos del servidor
         try{
-            //Si se usa localhost:
-            //System.out.println("IP de LocalHost = " + InetAddress.getLocalHost().toString());
-            //si se usa una ip
+            System.out.println("IP de LocalHost = " + InetAddress.getLocalHost().toString());
+            
             System.out.println("\nEscuchando en: ");
             System.out.println("IP Host = " + ip.getHostAddress());
             System.err.println("Puerto = " + _PUERTO + "\n");
@@ -84,9 +81,12 @@ public class servidoUDP {
                 //Enviamos
                 dgmSocket.send(dgmPaquete);
 
-                //Registremos en salida estandard
-                System.out.println(formatter.format(new Date()) + "\tCliente = "+ ipRemitente + ":" +
-                                   puertoRemitente + "\tEntrada = " + entrada + "\tSalida = " + salida);
+                System.out.println(
+                    formatter.format(new Date()) +
+                    "\tCliente = " + ipRemitente + ":" +
+                    puertoRemitente + "\tEntrada = " +
+                    entrada + "\tSalida = " + salida
+                    );
 
 
             } catch (Exception e){
@@ -96,3 +96,5 @@ public class servidoUDP {
 
     }
 }
+
+
